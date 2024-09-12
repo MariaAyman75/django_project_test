@@ -1,12 +1,26 @@
 <h1>{{ project.title }}</h1>
 <p>{{ project.details }}</p>
 <p>Category: {{ project.category.name }}</p>
+{% if project.images %}
+    <img src="{{ project.images.url }}" alt="{{ project.title }}" width="50" height="50px">
+{% else %}
+    <p>No image available for this project.</p>
+{% endif %}
+
+<!-- Display Project Tags -->
+<h3>Tags:</h3>
+<ul>
+    {% for tag in project.tags.all %}
+        <li>{{ tag.name }}</li>
+    {% endfor %}
+</ul>
 <p>Total Target: {{ project.total_target }} EGP</p>
 <p>Total Donated: {{ project.total_donated }} EGP</p>
 
-<form method="post">
+<form method="post" action="{% url 'project_detail' project.pk %}">
     {% csrf_token %}
     {{ donation_form.as_p }}
+    <input type="hidden" name="donate" value="true">
     <button type="submit">Donate</button>
 </form>
 
@@ -16,7 +30,12 @@
     <li>{{ donation.donor }} donated {{ donation.amount }} EGP on {{ donation.donated_at }}</li>
     {% endfor %}
 </ul>
-
+<h2>Similar Projects</h2>
+<ul>
+    {% for similar_project in similar_projects %}
+    <li><a href="{% url 'project_detail' similar_project.pk %}">{{ similar_project.title }}</a></li>
+    {% endfor %}
+</ul>
 <h2>Comments</h2>
 <ul>
     {% for comment in comments %}
@@ -46,3 +65,17 @@
     {{ comment_form.as_p }}
     <button type="submit" name="comment">Submit</button>
 </form>
+
+<h2>Rate this Project</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ rating_form.as_p }}
+    <button type="submit" name="rate">Submit Rating</button>
+</form>
+<p>Average Rating: {{ avg_rating|floatformat:1 }} / 5</p>
+{% if project.can_be_cancelled %}
+    <form method="post" action="{% url 'cancel_project' project.pk %}">
+        {% csrf_token %}
+        <button type="submit">Cancel Project</button>
+    </form>
+{% endif %}
