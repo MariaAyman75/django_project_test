@@ -1,0 +1,48 @@
+<h1>{{ project.title }}</h1>
+<p>{{ project.details }}</p>
+<p>Category: {{ project.category.name }}</p>
+<p>Total Target: {{ project.total_target }} EGP</p>
+<p>Total Donated: {{ project.total_donated }} EGP</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ donation_form.as_p }}
+    <button type="submit">Donate</button>
+</form>
+
+<h2>Donations</h2>
+<ul>
+    {% for donation in donations %}
+    <li>{{ donation.donor }} donated {{ donation.amount }} EGP on {{ donation.donated_at }}</li>
+    {% endfor %}
+</ul>
+
+<h2>Comments</h2>
+<ul>
+    {% for comment in comments %}
+    <li>
+        <strong>{{ comment.user }}:</strong> {{ comment.text }} <small>on {{ comment.created_at }}</small>
+
+        <ul>
+            {% for reply in comment.replies.all %}
+            <li>{{ reply.user }}: {{ reply.text }} <small>on {{ reply.created_at }}</small></li>
+            {% endfor %}
+        </ul>
+
+        <!-- Reply form -->
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="comment_id" value="{{ comment.id }}">
+            {{ reply_form.as_p }}
+            <button type="submit" name="reply">Reply</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+
+<h3>Add a Comment</h3>
+<form method="post">
+    {% csrf_token %}
+    {{ comment_form.as_p }}
+    <button type="submit" name="comment">Submit</button>
+</form>

@@ -1,0 +1,6 @@
+<h2>Donations</h2>
+<ul>
+    {% for donation in donations %}
+    <li>{{ donation.donor }} donated {{ donation.amount }} EGP on {{ donation.donated_at }}</li>
+    {% endfor %}
+</ul>
